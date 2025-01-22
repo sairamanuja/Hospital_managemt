@@ -92,53 +92,71 @@ export const GetAppointments = async (req, res) => {
 
 export const bookAppointment = async (req, res) => {
     try {
-      const {  date, startTime, endTime, doctorId } = req.body;
-      const patientId = req.user.id;
-      const hospitalId = req.hospital.id;
-console.log(hospitalId)  
-      if (!patientId || !date || !startTime || !endTime || !doctorId) {
-        return res.status(400).json({ message: "All fields are required." });
-      }
-  
-      const dayOfWeek = new Date(date).toLocaleString("en-us", { weekday: "long" });
-       
-      const bookSlot = await AppointmentModel_doctor.findOneAndUpdate({
-        doctor:doctorId,
-        hospital:hospitalId,
-        "availability.day":dayOfWeek,
-        "availability.slots.startTime":startTime,
-        "availability.slots.endTime":endTime,
-      },{$set:{
-        "availability.slots.isBooked":true
-      }})
-      console.log(bookSlot)
-      const newAppointment = new AppointmentModel_user({
-        doctor: doctorId,
-        hospital: hospitalId,
-        user: patientId,
-        availability: [
-          {
-            day: dayOfWeek,
-            slots: [
-              {
-                startTime:startTime,
-                endTime:endTime,
-                isBooked: true,
-              },
+        const { date, startTime, endTime, doctorId } = req.body;
+        const patientId = req.user.id;
+        const hospitalId = req.hospital.id;
+        console.log("Hospital ID:", hospitalId);
+        
+        if (!patientId || !date || !startTime || !endTime || !doctorId) {
+            return res.status(400).json({ message: "All fields are required." });
+        }
+
+        const dayOfWeek = new Date(date).toLocaleString("en-us", { weekday: "long" });
+
+     
+        const bookSlot = await AppointmentModel_doctor.findOneAndUpdate(
+            {
+                doctor: doctorId,
+                hospital: hospitalId,
+                "availability.day": dayOfWeek,
+                "availability.slots.startTime": startTime,
+                "availability.slots.endTime": endTime,
+            },
+            {
+                $set: {
+                    "availability.$.slots.$[slot].isBooked": true // Use positional operator for nested slots
+                }
+            },
+            {
+                arrayFilters: [{ "slot.startTime": startTime, "slot.endTime": endTime }], // Filter for the specific slot
+               
+            }
+        );
+
+        // Log the result of the update
+        console.log("Updated Slot:", bookSlot);
+
+        if (!bookSlot) {
+            return res.status(404).json({ message: "No matching slot found to update." });
+        }
+
+        const newAppointment = new AppointmentModel_user({
+            doctor: doctorId,
+            hospital: hospitalId,
+            user: patientId,
+            availability: [
+                {
+                    day: dayOfWeek,
+                    slots: [
+                        {
+                            startTime: startTime,
+                            endTime: endTime,
+                            isBooked: true,
+                        },
+                    ],
+                },
             ],
-          },
-        ],
-      });
-  
+        });
+
         await newAppointment.save();
-  
-  
-      return res.status(201).json({
-        message: "Appointment booked successfully.",
-        appointment: newAppointment,
-      });
+
+        return res.status(201).json({
+            message: "Appointment booked successfully.",
+            appointment: newAppointment,
+        });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+        console.error("Error booking appointment:", error); // Log the error
+        return res.status(500).json({ error: error.message });
     }
-  };
-  
+};
+

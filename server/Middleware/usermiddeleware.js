@@ -7,7 +7,7 @@ export const userMiddleware = async (req,res,next) =>{
    if(!token){
    return res.json("please check the token in headers")
    }
-   const jwtToken = token.split(" ")[2];
+   const jwtToken = token.split(" ")[1];
    console.log(jwtToken);
    
 
