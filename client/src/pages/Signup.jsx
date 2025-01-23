@@ -20,32 +20,34 @@ const Signup = () => {
           <h1 className="text-2xl font-bold pb-2">Create Account</h1>
           <p className="text-gray-500 pb-4">Please sign up to book an appointment</p>
 
+          <form onSubmit={handleSubmit}>
           <TextBox
             label="Full Name"
             text={fullName}
-            setText={setFullName}
+            onChange={(e) => setFullName(e.target.value)}
             placeholder="Enter your full name"
           />
           <TextBox
             label="Email"
             text={email}
-            setText={setEmail}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
           />
           <TextBox
             label="Password"
             text={password}
-            setText={setPassword}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
           />
 
           <button
             className="bg-blue-500 text-white p-2 rounded-md mt-4"
-            onClick={handleSubmit}
+            type="submit"
           >
             Create account
           </button>
 
+          </form>
           <p className="mt-4 text-gray-500">
             Already have an account?{' '}
             <a href="/login" className="text-blue-500">
