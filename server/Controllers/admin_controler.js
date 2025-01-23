@@ -101,14 +101,17 @@ export const AddDoctor = async (req,res)=>{
 
 export const AllDoctor = async (req,res)=>{
     const hospitalId = req.hospital.id;
-
-
    
     const doctors = await DoctorModel.find({  hospital: hospitalId });
     res.status(200).json({ doctors });
     
 }
-
+export const DoctorSpeciality = async (req,res)=>{
+    const hospitalId = req.hospital.id;
+    const speciality = req.body.speciality;
+    const doctors = await DoctorModel.find({ hospital: hospitalId, speciality: speciality });
+    res.status(200).json({ doctors });
+}
 export const EditDoctor = async (req, res) => {
     const { name, email, password, experience, fees, speciality, education, address, aboutme } = req.body;
     const { doctorId } = req.body;

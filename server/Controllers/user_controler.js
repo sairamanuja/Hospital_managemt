@@ -67,17 +67,18 @@ export const signup =async (req,res)=>{
 
 export const GetAppointments = async (req, res) => {
   try {
-    const { doctorId, date } = req.body;
+    const patientId = req.user.id;
+    const hospitalId = req.hospital.id;
 
-    if (!doctorId || !date) {
-      return res.status(400).json({ message: "doctor id and date are required." });
+    if (!patientId) {
+      return res.status(400).json({ message: "patient id is required." });
     }
 
-    const dayOfWeek = new Date(date).toLocaleString("en-us", { weekday: "long" });
 
-    const appointments = await AppointmentModel_doctor.find({
-      doctor: doctorId,
-      "availability.day": dayOfWeek,
+    const appointments = await AppointmentModel_user.find({
+       
+        hospital: hospitalId,
+        user: patientId,
     });
 
 
