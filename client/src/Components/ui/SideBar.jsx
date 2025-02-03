@@ -4,13 +4,13 @@ import { FaBars } from 'react-icons/fa';
 const SideBar = () => {
   const [open, setOpen] = useState(true);
   return (
-    <div className={`w-60 h-screen border-r-2 border-gray-300 p-5 fixed ${open ? 'left-0' : '-left-[232px]'} transition-all duration-300`}>
-      {/* Toggle Button - Inside but stays visible */}
+    <div className={`bg-white z-20 w-60 h-screen border-r-2 border-gray-300 p-5 fixed ${open ? 'left-0' : '-left-48'} transition-all duration-300`}>
+      {/* Toggle Button - Positioned inside of and fixed the sidebar */}
       <button 
         onClick={() => setOpen(!open)} 
-        className=" fixed p-2 hover:bg-gray-200 rounded-md translate-x-[160px]"
+        className="absolute right-2 top-4 p-2 hover:bg-gray-200 rounded-md"
       >
-        <FaBars />
+        <FaBars className={`transition-all duration-300 ${open ? '' : 'rotate-180'}`} />
       </button>
 
       <div className="mt-12">

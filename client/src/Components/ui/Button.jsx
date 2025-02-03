@@ -1,11 +1,5 @@
-import React from 'react'
-
-const Button = () => {
-  return (
-    <button className="bg-blue-500 text-white p-2 rounded-md mt-4">
-        {children}
-    </button>
-  )
+import { Button } from "@material-tailwind/react";
+ 
+export default function Example() {
+  return <Button className="bg-blue-500 text-white p-3 rounded-md">Button</Button>;
 }
-
-export default Button

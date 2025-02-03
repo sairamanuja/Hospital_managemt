@@ -1,5 +1,3 @@
-import React from 'react'
-
 export const TextBox = ({label, text, placeholder, onChange}) => {
   console.log(text)
   return (

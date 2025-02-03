@@ -1,4 +1,4 @@
-import { react } from 'react'
+import React from 'react'
 import './App.css'
 import {Routes, Route, BrowserRouter} from 'react-router-dom'
 import HomePage from './pages/HomePage'
@@ -8,6 +8,10 @@ import ContactUs from './pages/ContactUs'
 import Profile from './pages/Profile'
 import Aboutus from './pages/Aboutus'
 import Admin_Adddoctor from './pages/Admin_Adddoctor'
+import {  AdminSignup } from './pages/AdminSignup'
+import AdminLogin  from './pages/AdminLogin'
+import Sidebar from './Components/ui/Sidebar2'
+import axios from 'axios'
 function App() {
   
 
@@ -22,6 +26,11 @@ function App() {
       <Route path="/profile" element={<Profile/>}/>
       <Route path="/aboutus" element={<Aboutus/>}/>
       <Route path="/admin_adddoctor" element={<Admin_Adddoctor/>}/>
+      <Route path="/adminsignup" element={<AdminSignup/>}/>
+      <Route path="/adminlogin" element={<AdminLogin/>}/>
+      <Route path="/sidebar2" element={<Sidebar/>}/>
+
+      
      </Routes>   
      </BrowserRouter>
      </>

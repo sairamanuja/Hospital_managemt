@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Navbar } from '../Components/Layout/home/Navbar';
+import AdminNav from '../Components/ui/AdminNav';
 import { TextBox } from '../Components/ui/TextBox';
 
 import axios from 'axios';
 
-const Signup = () => {
+export const AdminSignup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,16 +16,17 @@ const Signup = () => {
     e.preventDefault();
     console.log({ name, email, password,address,phone });
     try {
-      const response = await axios.post('http://localhost:3000/user/signup', { name, email, password,address,phone });
+      const response = await axios.post('http://localhost:3000/admin/signup', { name, email, password,address,phone });
       console.log(response.data);
+      alert('Signup successful!');
     } catch (error) {
       console.error('Signup failed:', error);
     }
   };
 
   return (
-    <div className="w-[80%] m-auto h-screen">
-      <Navbar />
+    <div className="w-[100%] m-auto h-screen">
+        <AdminNav />
       <div className="flex flex-col justify-center items-center">
         <div className="bg-white p-[40px] rounded-md shadow-xl flex flex-col m-auto mt-10 w-[30%] h-[auto]">
           <h1 className="text-2xl font-bold pb-2">Create Account</h1>
@@ -73,7 +74,7 @@ const Signup = () => {
           </form>
           <p className="mt-4 text-gray-500">
             Already have an account?{' '}
-            <a href="/login" className="text-blue-500">
+            <a href="/adminlogin" className="text-blue-500">
               Login here
             </a>
           </p>
@@ -83,4 +84,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+

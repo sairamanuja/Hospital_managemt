@@ -1,4 +1,3 @@
-import React from 'react'
 import Doctor from './Doctor'
 
 export const Doctor_component = () => {

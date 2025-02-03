@@ -7,6 +7,7 @@ import {Content_2} from '../Components/Layout/home/Doctor_component'
 const HomePage = () => {
   return (
     <>
+    
      <div className="w-[80%] m-auto h-screen">
     <Navbar/>
     <Content_1/>

@@ -1,6 +1,26 @@
 import React from 'react'
 import {Navbar} from '../Components/Layout/home/Navbar'
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
 const Profile = () => {
+  const [user, setUser] = useState([]);
+  const token = localStorage.getItem('token');
+  
+
+    
+
+  
+  
+
+  useEffect( () => {
+    const fetchuser = async () => {
+      const response = await axios.get('');
+      setUser(response.data);
+    }
+    fetchuser
+    
+  }, []);
   return (
     <>
     <div className="w-[80%] m-auto h-screen">
