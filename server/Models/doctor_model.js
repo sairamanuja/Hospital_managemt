@@ -14,11 +14,7 @@ const DoctorSchema = new Schema({
         type: Number,
         required: true
     },
-    hospital: {
-        type: Schema.Types.ObjectId,
-        ref: "Hospitals",
-        required: true,
-    },
+   
     address: {
         type: String,
         required: true

@@ -35,20 +35,20 @@ export const createHospital =async (req,res)=>{
 }
 
 export const selectHospital = async (req, res) => {
-    const { name } = req.body;
-    if (!name) {
-        return res.status(400).json({ message: "enter name" });
+    const { id } = req.body;
+    if (!id) {
+        return res.status(400).json({ message: "enter id" });
     }
     try {
-            const admin = await hospitalModel.findOne({ name });
-        if (!admin) {
-            return res.status(404).json({ message: "admin not found" });
+            const hospital = await hospitalModel.findOne({ _id: id  });
+        if (!hospital) {
+            return res.status(404).json({ message: "hospital not found" });
         }
         
         const JWT_SECRET = "manish12"
-        const token = jwt.sign({ id: admin._id }, JWT_SECRET);
+        const token = jwt.sign({ id: hospital._id }, JWT_SECRET);
         if(token){
-            return res.status(200).json({ message: "admin logged in successfully", token });
+            return res.status(200).json({ message: "hospital selected successfully", token });
         }
     } catch (error) {
         console.error(error)
@@ -60,11 +60,14 @@ export const selectHospital = async (req, res) => {
 
 export const AllHospital = async (req, res) => {
     try {
-        const hospitals = await hospitalModel.find({}, 'name');
         
-        const hospitalNames = hospitals.map(hospital => hospital.name);
+        const hospitals = await hospitalModel.find({});
+        const hospitalData = hospitals.map(hospital => ({
+            id: hospital._id,
+            name: hospital.name
+        }));
         
-        res.status(200).json({ names: hospitalNames });
+        res.status(200).json({ hospitals: hospitalData });
     } catch (error) {
         // Handle any potential errors
         res.status(500).json({ message: "An error occurred", error: error.message });

@@ -11,7 +11,7 @@ export const signup =async (req,res)=>{
         return res.status(400).json({ message:"enter all the details"})
 
     }
-    const hospitalId = req.hospital.id;
+   
     try{
           const admin = await  AdminModel.findOne({email})
           if(admin){
@@ -25,7 +25,7 @@ export const signup =async (req,res)=>{
             name,
             address,
             phone,
-            hospital:hospitalId
+           
           })
           if(newadmin){
             return res.status(200).json({message:"signup done sucessfully"})
@@ -39,7 +39,6 @@ export const signup =async (req,res)=>{
 }
 
 export const login = async (req, res) => {
-    const hospitalId = req.hospital.id;
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ message: "enter email and password" });
@@ -54,7 +53,7 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: "invalid password" });
         }
         const JWT_SECRET = "manish12"
-        const token = jwt.sign({ id: admin._id,hospital:hospitalId }, JWT_SECRET);
+        const token = jwt.sign({ id: admin._id}, JWT_SECRET);
         if(token){
             return res.status(200).json({ message: "admin logged in successfully", token });
         }
@@ -64,21 +63,46 @@ export const login = async (req, res) => {
     }
 }
 
-export const AddDoctor = async (req,res)=>{
+export const AddDoctor = async (req, res) => {
+    try {
+        const {
+            name,
+            email,
+            password,
+            experience,
+            fees,
+            speciality,
+            education,
+            address,
+            aboutme,
+            phone
+        } = req.body;
 
-    const {name,email,password,experience,fees,speciality,education,address,aboutme,phone}= req.body
-     const adminId = req.admin.id;
-     const hospitalId = req.hospital.id;
-     console.log(adminId)
-    try{
-        
-        const hashedPassword = await bcrypt.hash(password,10); 
+        // Validate required fields
+        if (!name || !email || !password || !phone) {
+            return res.status(400).json({
+                message: "Please provide all required fields"
+            });
+        }
+
+        // Check if doctor already exists
+        const existingDoctor = await DoctorModel.findOne({ email });
+        if (existingDoctor) {
+            return res.status(400).json({
+                message: "Doctor with this email already exists"
+            });
+        }
+
+        const adminId = req.admin.id;
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password.toString(), salt);
+
         const Doctor = await DoctorModel.create({
             name,
-          
-            password:hashedPassword,
+            password: hashedPassword,
             email,
-            hospital:hospitalId,
             experience,
             fees,
             aboutme,
@@ -86,32 +110,60 @@ export const AddDoctor = async (req,res)=>{
             education,
             address,
             phone,
-            updatedBy:adminId
-        })
-        if(Doctor){
-            return res.status(200).json({message:"doctor created sucessfully"})
-        }
-    }
-    catch(error){
-        console.error(error)
-        return res.status(500).json({message:"internal server error"})
+            updatedBy: adminId
+        });
 
+        return res.status(201).json({
+            success: true,
+            message: "Doctor created successfully",
+            doctor: {
+                name: Doctor.name,
+                email: Doctor.email,
+                speciality: Doctor.speciality
+            }
+        });
+
+    } catch (error) {
+        console.error('AddDoctor Error:', error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        });
     }
-}
+};
 
 export const AllDoctor = async (req,res)=>{
-    const hospitalId = req.hospital.id;
    
-    const doctors = await DoctorModel.find({  hospital: hospitalId });
+    const doctors = await DoctorModel.find({  });
     res.status(200).json({ doctors });
     
 }
-export const DoctorSpeciality = async (req,res)=>{
-    const hospitalId = req.hospital.id;
+export const DoctorBySpeciality = async (req,res)=>{
     const speciality = req.body.speciality;
-    const doctors = await DoctorModel.find({ hospital: hospitalId, speciality: speciality });
+    const doctors = await DoctorModel.find({ speciality: speciality });
     res.status(200).json({ doctors });
 }
+
+export const Doctor = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const doctor = await DoctorModel.findById(id);
+        if (!doctor) {
+            return res.status(404).json({ message: "Doctor not found" });
+        }
+        res.status(200).json({ doctor });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+
+
+
+
 export const EditDoctor = async (req, res) => {
     const { name, email, password, experience, fees, speciality, education, address, aboutme } = req.body;
     const { doctorId } = req.body;
@@ -154,28 +206,34 @@ export const EditDoctor = async (req, res) => {
 export const createAppointmentByDoctor = async (req, res) => {
     try {
         const { doctorId, date, startTime, endTime } = req.body;
-        const hospitalId = req.hospital.id;
         const adminId = req.admin.id;
+
+        // Validate date format
+        const appointmentDate = new Date(date);
+        if (isNaN(appointmentDate)) {
+            return res.status(400).json({ message: "Invalid date format" });
+        }
 
         const doctor = await DoctorModel.findOne({ _id: doctorId });
         if (!doctor) {
             return res.status(404).json({ message: "Doctor not found" });
         }
 
-        const dayOfWeek = new Date(date).toLocaleString("en-us", { weekday: "long" });
+        // Format date to YYYY-MM-DD for consistent comparison
+        const formattedDate = appointmentDate.toISOString().split('T')[0];
+        const dayOfWeek = appointmentDate.toLocaleString("en-us", { weekday: "long" });
 
         let appointment = await AppointmentModel_doctor.findOne({
             doctor: doctorId,
-            hospital: hospitalId,
-            "availability.day": dayOfWeek,
+            "availability.date": formattedDate  // Changed from day to date
         });
 
         if (!appointment) {
             appointment = new AppointmentModel_doctor({
                 doctor: doctorId,
-                hospital: hospitalId,
                 availability: [{
                     day: dayOfWeek,
+                    date: formattedDate,  // Added date field
                     slots: [{
                         startTime,
                         endTime,
@@ -191,11 +249,12 @@ export const createAppointmentByDoctor = async (req, res) => {
             });
         }
 
-        const dayAvailability = appointment.availability.find(a => a.day === dayOfWeek);
+        const dayAvailability = appointment.availability.find(a => a.date === formattedDate);  // Changed from day to date
         
         if (!dayAvailability) {
             appointment.availability.push({
                 day: dayOfWeek,
+                date: formattedDate,  // Added date field
                 slots: [{
                     startTime,
                     endTime,
@@ -267,8 +326,9 @@ function convertTimeToMinutes(timeStr) {
   
 export const getAllAppointments = async (req, res) => {
     try {
-        const hospitalId = req.hospital.id;
-        const appointments = await AppointmentModel_doctor.find({ hospital: hospitalId })
+        const { id } = req.params;
+        console.log("id",id)
+        const appointments = await AppointmentModel_doctor.find({doctor:id});   
         return res.status(200).json({ appointments });
     } catch (error) {
         console.error("Error fetching appointments:", error.message);
@@ -278,30 +338,15 @@ export const getAllAppointments = async (req, res) => {
 
 export const deleteAppointmentSlot = async (req, res) => {
     try {
-        const { doctorId, date, startTime, endTime } = req.body;
-        const hospitalId = req.hospital.id;
-       //const adminId = req.admin.id;
-
-        const dayOfWeek = new Date(date).toLocaleString("en-us", { weekday: "long" });
-
+        const { appointmentId, slotId } = req.params;
+        
         const appointment = await AppointmentModel_doctor.findOneAndUpdate(
-            {
-                doctor: doctorId,
-                hospital: hospitalId,
-                "availability.day": dayOfWeek,
-                "availability.slots": {
-                    $elemMatch: {
-                        startTime: startTime,
-                        endTime: endTime,
-                        isBooked: false  // Only allow deletion of unbooked slots
-                    }
-                }
-            },
+            { _id: appointmentId },
             {
                 $pull: {
-                    "availability.$.slots": {
-                        startTime: startTime,
-                        endTime: endTime
+                    "availability.$[].slots": {
+                        _id: slotId,
+                        isBooked: false  // Only allow deletion of unbooked slots
                     }
                 }
             },

@@ -4,10 +4,11 @@ import adminRouter from "./Routes/admin_routes.js";
 import hospitalRouter from "./Routes/hospital_routes.js";
 import userRouter from "./Routes/user_routes.js";
 const app = express()
+import cors from 'cors';
 const port = 3000
 
 app.use(express.json());
-
+app.use(cors());
 app.get('/', (req, res) => res.send('Hello World!'))
 
 ConnectDB();

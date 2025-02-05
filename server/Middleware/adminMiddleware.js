@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken"
+import { AdminModel } from '../Models/admin_model.js';
 
 export const adminMiddleware = async (req,res,next) =>{
    
@@ -18,7 +19,6 @@ export const adminMiddleware = async (req,res,next) =>{
     console.log(JWT_SECRET)
     if(decodedToken){
       req.admin = { id: decodedToken.id };
-      req.hospital = { id: decodedToken.hospital };
         next() 
     }
     else{
@@ -30,3 +30,30 @@ export const adminMiddleware = async (req,res,next) =>{
    }
 
 }
+
+export const adminMiddlewareNew = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        const decoded = jwt.verify(token, "manish12"); // Use same secret as login
+        const admin = await AdminModel.findById(decoded.id);
+        
+        if (!admin) {
+            return res.status(401).json({ message: "Not authorized" });
+        }
+
+        req.admin = {
+            id: admin._id,
+            email: admin.email
+        };
+
+        next();
+    } catch (error) {
+        console.error("Auth middleware error:", error);
+        return res.status(401).json({ message: "Not authorized" });
+    }
+};

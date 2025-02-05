@@ -19,7 +19,7 @@ export const userMiddleware = async (req,res,next) =>{
     if(decodedToken){
       req.user = { id: decodedToken.id };
       req.hospital = { id: decodedToken.hospital };
-        next() 
+        next(); 
     }
     else{
        return res.status(400).json({message:"user not authenticated"})
