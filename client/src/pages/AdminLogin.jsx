@@ -3,6 +3,7 @@ import AdminNav from '../Components/ui/AdminNav';
 import { TextBox } from '../Components/ui/TextBox';
 import axios from 'axios';
 import { Link, useNavigate  } from 'react-router-dom';
+import {API} from "../Components/config/Api"
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -27,18 +28,19 @@ const AdminLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-        console.log({ email, password });
-    const response = await axios.post('http://localhost:3000/admin/login', { email, password });
-      localStorage.setItem('token', response.data.token);
-      console.log(response.data);
-      const {token} = response.data;
-        if(token){
-            navigate('/admin_adddoctor');
-        }else{
-            console.log('Login failed:', response.data);
-        }
+      
+      const response = await API.post('/admin/login', { email, password });
+      const { token } = response.data;
+      
+      if (!token) {
+        console.log('Login failed: No token received');
+        return;
+      }
+
+      localStorage.setItem('token', token);
+      navigate('/admin/adddoctor');
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Login failed:', error.response?.data || error.message);
     }
   };
 

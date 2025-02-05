@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import AdminNav from '../Components/ui/AdminNav';
 import { TextBox } from '../Components/ui/TextBox';
+import {API} from "../Components/config/Api"
+import { Navigate } from 'react-router-dom';
+
+
 
 import axios from 'axios';
 
@@ -16,9 +20,11 @@ export const AdminSignup = () => {
     e.preventDefault();
     console.log({ name, email, password,address,phone });
     try {
-      const response = await axios.post('http://localhost:3000/admin/signup', { name, email, password,address,phone });
+      const response = await axios.API.post('/admin/signup', { name, email, password,address,phone });
       console.log(response.data);
       alert('Signup successful!');
+      return <Navigate to="/adminlogin" />
+
     } catch (error) {
       console.error('Signup failed:', error);
     }

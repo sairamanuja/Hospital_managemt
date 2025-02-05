@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { FaBars } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+
 
 const SideBar = () => {
   const [open, setOpen] = useState(true);
@@ -15,13 +17,25 @@ const SideBar = () => {
 
       <div className="mt-12">
         <ul className="space-y-2">
-          <li className="cursor-pointer hover:bg-gray-300 p-2 rounded">Dashboard</li>
-          <li className="cursor-pointer hover:bg-gray-300 p-2 rounded">Appointments</li>
-          <li className="cursor-pointer hover:bg-gray-300 p-2 rounded">Add Doctor</li>
-          <li className="cursor-pointer hover:bg-gray-300 p-2 rounded">Doctors List</li>
-          <li className="cursor-pointer hover:bg-gray-300 p-2 rounded">Patients</li>
+          <li className="cursor-pointer hover:bg-gray-300 p-2 rounded">
+            <Link to="/admin/dashboard">Dashboard</Link>
+          </li>
+          <li className="cursor-pointer hover:bg-gray-300 p-2 rounded">
+            <Link to="/admin/appointments">Appointments</Link>
+          </li>
+          <li className="cursor-pointer hover:bg-gray-300 p-2 rounded">
+            <Link to="/admin/adddoctor">Add-Doctor</Link>
+          </li>
+
+          <li className="cursor-pointer hover:bg-gray-300 p-2 rounded">
+            <Link to="/admin/doctors">Doctors List</Link>
+          </li>
+          <li className="cursor-pointer hover:bg-gray-300 p-2 rounded">
+            <Link to="/admin/patients">Patients</Link>
+          </li>
         </ul>
       </div>
+
     </div>
   )
 }

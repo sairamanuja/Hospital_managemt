@@ -1,4 +1,5 @@
 import Doctor from './Doctor'
+import { useNavigate} from 'react-router-dom'
 
 export const Doctor_component = () => {
   return (
@@ -31,6 +32,7 @@ export const Doctor_component = () => {
 }
 
 export const Content_2 = () => {
+    const navigate = useNavigate()
     return(
    <div className="mt-[100px]">
      <div className="flex flex-row  bg-[#5F6FFF] h-[250px] w-[100%] rounded-lg m-auto">
@@ -38,7 +40,7 @@ export const Content_2 = () => {
             <h1 className='text-white text-2xl font-bold mb-4'>Book an Appointment</h1>
             <h1 className='text-white text-2xl mb-4'>Book Appointment 
             With 100+ Trusted Doctors</h1>
-            <button className='bg-white text-black px-4 py-2 rounded-3xl mt-4 w-[160px]'>Create account</button>
+            <button className='bg-white text-black px-4 py-2 rounded-3xl mt-4 w-[160px]' onClick={()=>{navigate('/signup')}}>Create account</button>
         </div>
         <div className="w-[30%] flex justify-center items-center -translate-y-7">
             <img src="/src/Assets/HomePage/appointment-doc-img.png " alt="" />

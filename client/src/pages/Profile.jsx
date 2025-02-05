@@ -5,14 +5,7 @@ import axios from 'axios';
 
 const Profile = () => {
   const [user, setUser] = useState([]);
-  const token = localStorage.getItem('token');
   
-
-    
-
-  
-  
-
   useEffect( () => {
     const fetchuser = async () => {
       const response = await axios.get('');

@@ -12,6 +12,9 @@ import {  AdminSignup } from './pages/AdminSignup'
 import AdminLogin  from './pages/AdminLogin'
 import Sidebar from './Components/ui/Sidebar2'
 import axios from 'axios'
+import { ProtectedRoute} from './Components/config/config'
+import Admin_doctors from './pages/Admin_doctors'
+import {Admin_doctor_view} from './pages/Admin_doctor_view'
 function App() {
   
 
@@ -25,7 +28,12 @@ function App() {
       <Route path="/contactus" element={<ContactUs/>}/>
       <Route path="/profile" element={<Profile/>}/>
       <Route path="/aboutus" element={<Aboutus/>}/>
-      <Route path="/admin_adddoctor" element={<Admin_Adddoctor/>}/>
+      <Route element={<ProtectedRoute />}>
+        <Route path="/admin/adddoctor" element={<Admin_Adddoctor />} />
+        <Route path="/admin/doctors" element={<Admin_doctors />} />
+        <Route path="/admin/doctor/:id" element={<Admin_doctor_view />} />
+      </Route>
+     
       <Route path="/adminsignup" element={<AdminSignup/>}/>
       <Route path="/adminlogin" element={<AdminLogin/>}/>
       <Route path="/sidebar2" element={<Sidebar/>}/>

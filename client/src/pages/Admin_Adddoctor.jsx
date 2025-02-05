@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 //import Sidebar from '../Components/ui/Sidebar2'
 import SideBar from '../Components/ui/SideBar'
+import {API} from '../Components/config/api'
 
 const Admin_Adddoctor = () => {
   const [doctorName, setDoctorName] = useState('')
@@ -20,15 +21,9 @@ const Admin_Adddoctor = () => {
   const [doctorEductaion, setDoctorEducation] = useState('')
   const [address, setAddress] = useState('')
   const navigate = useNavigate()
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
+  
 
-      navigate('/adminlogin')
-    } else {  
-      console.log('Token:', token)}
-  }, [])
-  const handleAddDoctor = (e) => {
+  const handleAddDoctor = async (e) => {
     e.preventDefault();
     
     // Create the data object with matching field names
@@ -45,27 +40,16 @@ const Admin_Adddoctor = () => {
         address: address
     };
 
-    axios.post('http://localhost:3000/admin/addDoctor', 
-        doctorData,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        }
-    )
-    .then(response => {
-        console.log(response.data);
-        // Show success message
-        alert("Doctor added successfully!");
-        // Optionally redirect
+    try {
+        await API.post('/admin/addDoctor', doctorData);
+        alert('Doctor added successfully');
         navigate('/admin/doctors');
-    })
-    .catch(error => {
-        console.error('Failed to add doctor:', error.response?.data || error);
-        alert(error.response?.data?.message || "Failed to add doctor");
-    });
-};
+    } catch (error) {
+        console.error('Failed to add doctor:', error);
+        alert('Failed to add doctor');
+    }
+  };
+
   return (
 
     <>
