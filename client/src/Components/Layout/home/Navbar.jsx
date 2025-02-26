@@ -10,7 +10,7 @@ export const Navbar = () => {
       </div>
       <div className="flex gap-3">
         <a className='flex items-center cursor-pointer ' onClick={()=>navigate("/")}>HOME</a>
-        <a className='flex items-center' >ALL DOCTORS</a>
+        <a className='flex items-center' onClick={()=>navigate("/allDoctors")} >ALL DOCTORS</a>
         <a className='flex items-center cursor-pointer' onClick={()=>navigate("/aboutus")}>ABOUT</a>
         <a className='flex items-center cursor-pointer' onClick={()=>navigate("/contactus")}>CONTACT</a>
       </div>

@@ -1,5 +1,5 @@
 import express from 'express';
-const adminRouter = express.Router();
+export const adminRouter = express.Router();
 import { hospitalMiddleware } from '../Middleware/hospitalMiddleware.js';
 import { adminMiddleware } from '../Middleware/adminMiddleware.js';
 import { Doctor } from '../Controllers/admin_controler.js';

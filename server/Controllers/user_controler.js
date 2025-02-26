@@ -1,6 +1,7 @@
 import { AppointmentModel_doctor } from "../Models/appointment_doctor.js";
 import { AppointmentModel_user } from "../Models/appointment_user.js";
 import { UserModel } from "../Models/user_model.js";
+import { DoctorModel } from "../Models/doctor_model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -95,6 +96,7 @@ export const bookAppointment = async (req, res) => {
     try {
         const { date, startTime, endTime, doctorId } = req.body;
         const patientId = req.user.id;
+        console.log("patient :"+patientId)
         
         if (!patientId || !date || !startTime || !endTime || !doctorId) {
             return res.status(400).json({ message: "All fields are required." });
@@ -141,7 +143,8 @@ export const bookAppointment = async (req, res) => {
 
         return res.status(201).json({
             message: "Appointment booked successfully",
-            appointment: newUserAppointment
+            appointment: newUserAppointment,
+            success:"true"
         });
 
     } catch (error) {
@@ -150,3 +153,53 @@ export const bookAppointment = async (req, res) => {
     }
 };
 
+export const AllDoctor = async (req,res)=>{
+   
+    const doctors = await DoctorModel.find({  });
+    res.status(200).json({ doctors });
+    
+}
+export const Doctor = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const doctor = await DoctorModel.findById(id);
+        if (!doctor) {
+            return res.status(404).json({ message: "Doctor not found" });
+        }
+        res.status(200).json({ doctor });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getAllAppointments = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log("id",id)
+        const appointments = await AppointmentModel_doctor.find({doctor:id});   
+        return res.status(200).json({ appointments });
+    } catch (error) {
+        console.error("Error fetching appointments:", error.message);
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+export const profile = async (req, res) => {
+    const patientId = req.user.id;
+
+    if (!patientId) {
+        return res.status(400).json({ message: "Patient ID is required." });
+    }
+
+    try {
+        const user = await UserModel.findById(patientId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        return res.status(200).json({ user });
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+}

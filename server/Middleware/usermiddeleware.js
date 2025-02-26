@@ -18,7 +18,7 @@ export const userMiddleware = async (req,res,next) =>{
     console.log(JWT_SECRET)
     if(decodedToken){
       req.user = { id: decodedToken.id };
-      req.hospital = { id: decodedToken.hospital };
+     
         next(); 
     }
     else{

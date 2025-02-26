@@ -1,5 +1,13 @@
-import { Button } from "@material-tailwind/react";
- 
-export default function Example() {
-  return <Button className="bg-blue-500 text-white p-3 rounded-md">Button</Button>;
-}
+import React from 'react';
+
+export const Button = ({ text, onClick }) => {
+  return (
+    <div
+      className="p-3 bg-[#5F6FFF] text-white rounded-md cursor-pointer text-center w-fit"
+      onClick={onClick}
+    >
+      {text}
+    </div>
+  );
+};
+

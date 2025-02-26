@@ -1,7 +1,36 @@
 import Doctor from './Doctor'
 import { useNavigate} from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { API } from '../../config/Api'
 
 export const Doctor_component = () => {
+
+    const navigate = useNavigate();
+
+   const [doctors, setDoctors] = useState([]);
+    useEffect(() => {
+        const fetchDoctors = async () => {   
+            try {
+                console.log('Fetching doctor details...');
+                const response = await API.get(`/user/allDoctors`);
+                console.log('Doctor details:', response.data.doctors);
+                response.data.doctors.forEach(doctor => {
+                    console.log('Doctor ID:', doctor._id);
+                });
+                setDoctors(response.data.doctors);
+                console.log('Doctors fetched successfully');
+            } catch (error) {
+                console.error('Error fetching doctor details:', error);
+            }
+        }
+        fetchDoctors();
+    }, []);
+
+    // Log doctors to verify the state
+    useEffect(() => {
+        console.log(doctors);
+    }, [doctors]); // This will log doctors whenever it changes
+
   return (
     <div className='mt-14'>
         <div className=" p-4 pb-7">
@@ -10,14 +39,16 @@ export const Doctor_component = () => {
         </div>
         
         <div className="flex flex-wrap justify-center gap-4">
-            <Doctor image={'/src/Assets/HomePage/General_physician.png'} name="Dr. Richard James" speciality="General physician"/>
-            <Doctor image={'/src/Assets/HomePage/General_physician.png'} name="Dr. Richard James" speciality="General physician"/>
-            <Doctor image={'/src/Assets/HomePage/General_physician.png'} name="Dr. Richard James" speciality="General physician"/>
-            <Doctor image={'/src/Assets/HomePage/General_physician.png'} name="Dr. Richard James" speciality="General physician"/>
-            <Doctor image={'/src/Assets/HomePage/General_physician.png'} name="Dr. Richard James" speciality="General physician"/>
-            <Doctor image={'/src/Assets/HomePage/General_physician.png'} name="Dr. Richard James" speciality="General physician"/>
-            <Doctor image={'/src/Assets/HomePage/General_physician.png'} name="Dr. Richard James" speciality="General physician"/>
-            <Doctor image={'/src/Assets/HomePage/General_physician.png'} name="Dr. Richard James" speciality="General physician"/>
+            {doctors && doctors.map((doctor) => (
+                
+                <Doctor 
+                    doctorId={doctor._id}
+                    image={doctor.image || '/src/Assets/HomePage/General_physician.png'}
+                    name={doctor.name || 'Doctor Name'}
+                    speciality={doctor.speciality || 'Speciality'}
+              
+                />
+            ))}
         </div>
 
         <div className="flex justify-center mt-[40px]">
