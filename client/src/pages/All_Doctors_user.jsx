@@ -5,7 +5,7 @@ import { API } from '../Components/config/Api';
 import Doctor from '../Components/Layout/home/Doctor';
 
 export const All_Doctors_user = () => {
-  const [doctors, setDoctors] = useState([]);
+ const [doctors, setDoctors] = useState([]);
   const [uniqueSpecialities, setUniqueSpecialities] = useState([]);
   const [selectedSpeciality, setSelectedSpeciality] = useState('');
   const [loading, setLoading] = useState(true);
@@ -58,7 +58,7 @@ export const All_Doctors_user = () => {
 
   if (error) {
     return <p className="text-red-500">{error}</p>;
-  }
+  } 
 
   return (
     <>

@@ -2,6 +2,9 @@ import {hospitalModel} from "../Models/hospital_model.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+
+dotenv.config()
 export const createHospital =async (req,res)=>{
    
  const {email,password,name,address,phone}= req.body;
@@ -45,7 +48,7 @@ export const selectHospital = async (req, res) => {
             return res.status(404).json({ message: "hospital not found" });
         }
         
-        const JWT_SECRET = "manish12"
+        const JWT_SECRET = process.env.JWT_SECRET
         const token = jwt.sign({ id: hospital._id }, JWT_SECRET);
         if(token){
             return res.status(200).json({ message: "hospital selected successfully", token });

@@ -1,9 +1,12 @@
 import {AdminModel} from "../Models/admin_model.js"
-import { DoctorModel } from "../Models/doctor_model.js";
+import {DoctorModel} from "../Models/doctor_model.js";
 import{AppointmentModel_doctor} from "../Models/appointment_doctor.js"
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+
+dotenv.config()
 export const signup =async (req,res)=>{
    
  const {email,password,name,address,phone}= req.body;
@@ -52,7 +55,7 @@ export const login = async (req, res) => {
         if (!isPasswordCorrect) {
             return res.status(401).json({ message: "invalid password" });
         }
-        const JWT_SECRET = "manish12"
+        const JWT_SECRET =  process.env.JWT_SECRET
         const token = jwt.sign({ id: admin._id}, JWT_SECRET);
         if(token){
             return res.status(200).json({ message: "admin logged in successfully", token });
@@ -326,15 +329,25 @@ function convertTimeToMinutes(timeStr) {
   
 export const getAllAppointments = async (req, res) => {
     try {
-        const { id } = req.params;
-        console.log("id",id)
-        const appointments = await AppointmentModel_doctor.find({doctor:id});   
-        return res.status(200).json({ appointments });
+      const { id } = req.params;
+      const { populate } = req.query;
+  
+      let query = AppointmentModel_doctor.find({ doctor: id });
+  
+      if (populate === "PatientId") {
+        query = query.populate({
+          path: "availability.slots.PatientId",
+          select: "name", // Only fetch the patient's name
+        });
+      }
+  
+      const appointments = await query.exec();
+      res.status(200).json({ appointments });
     } catch (error) {
-        console.error("Error fetching appointments:", error.message);
-        return res.status(500).json({ error: error.message });
+      console.error("Error fetching appointments:", error);
+      res.status(500).json({ message: "Failed to fetch appointments" });
     }
-};
+  };
 
 export const deleteAppointmentSlot = async (req, res) => {
     try {
@@ -367,5 +380,62 @@ export const deleteAppointmentSlot = async (req, res) => {
     } catch (error) {
         console.error("Error deleting appointment slot:", error.message);
         return res.status(500).json({ error: error.message });
+    }
+};
+export const AllDoctorAppointments = async (req, res) => {
+    try {
+        const appointments = await AppointmentModel_doctor.find()
+            .populate({
+                path: 'doctor',
+                model: 'Doctors', // Changed from 'Doctor' to 'Doctors'
+                select: 'name email speciality'
+            })
+            .populate({
+                path: 'availability.slots.PatientId',
+                model: 'User',
+                select: 'name email phone'
+            });
+
+        if (!appointments || appointments.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: "No appointments found",
+                appointments: []
+            });
+        }
+
+        const formattedAppointments = appointments.map(appointment => ({
+            doctorId: appointment.doctor?._id,
+            doctorName: appointment.doctor?.name,
+            doctorEmail: appointment.doctor?.email,
+            doctorSpeciality: appointment.doctor?.speciality,
+            appointments: appointment.availability.map(avail => ({
+                date: avail.date,
+                day: avail.day,
+                slots: avail.slots.map(slot => ({
+                    startTime: slot.startTime,
+                    endTime: slot.endTime,
+                    isBooked: slot.isBooked,
+                    patient: slot.PatientId ? {
+                        id: slot.PatientId._id,
+                        name: slot.PatientId.name,
+                        email: slot.PatientId.email,
+                        phone: slot.PatientId.phone
+                    } : null
+                }))
+            }))
+        }));
+
+        res.status(200).json({
+            success: true,
+            appointments: formattedAppointments
+        });
+    } catch (error) {
+        console.error("Error fetching appointments:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch appointments",
+            error: error.message
+        });
     }
 };

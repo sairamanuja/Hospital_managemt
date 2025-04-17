@@ -1,4 +1,7 @@
 import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+
+dotenv.config()
 
 export const userMiddleware = async (req,res,next) =>{
    
@@ -13,7 +16,7 @@ export const userMiddleware = async (req,res,next) =>{
 
    try{
 
-    const JWT_SECRET = "manish12"
+    const JWT_SECRET = process.env.JWT_SECRET
     const decodedToken = jwt.decode(jwtToken,JWT_SECRET)
     console.log(JWT_SECRET)
     if(decodedToken){

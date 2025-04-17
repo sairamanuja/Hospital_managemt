@@ -4,7 +4,9 @@ import { UserModel } from "../Models/user_model.js";
 import { DoctorModel } from "../Models/doctor_model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv"
 
+dotenv.config()
 
 export const signup =async (req,res)=>{
    
@@ -46,6 +48,7 @@ export const signup =async (req,res)=>{
      }
      try {
             const user = await UserModel.findOne({ email });
+            console.log(user)
          if (!user) {
              return res.status(404).json({ message: "user not found" });
          }
@@ -53,7 +56,7 @@ export const signup =async (req,res)=>{
          if (!isPasswordCorrect) {
              return res.status(401).json({ message: "invalid password" });
          }
-         const JWT_SECRET = "manish12"
+         const JWT_SECRET = process.env.JWT_SECRET
          const token = jwt.sign({ id: user._id}, JWT_SECRET);
          if(token){
              return res.status(200).json({ message: "user logged in successfully", token });
@@ -68,7 +71,6 @@ export const signup =async (req,res)=>{
 export const GetAppointments = async (req, res) => {
   try {
     const patientId = req.user.id;
-    const hospitalId = req.hospital.id;
 
     if (!patientId) {
         
@@ -76,11 +78,7 @@ export const GetAppointments = async (req, res) => {
     }
 
 
-    const appointments = await AppointmentModel_user.find({
-       
-        hospital: hospitalId,
-        user: patientId,
-    });
+    const appointments = await AppointmentModel_user.find({ user: patientId }).populate('doctor');
 
 
     return res.status(200).json({
@@ -96,27 +94,30 @@ export const bookAppointment = async (req, res) => {
     try {
         const { date, startTime, endTime, doctorId } = req.body;
         const patientId = req.user.id;
-        console.log("patient :"+patientId)
-        
+        console.log("patient :" + patientId);
+
         if (!patientId || !date || !startTime || !endTime || !doctorId) {
             return res.status(400).json({ message: "All fields are required." });
         }
 
-        
+        // Update the doctor's appointment slot and set the PatientId
         const updatedDoctorSlot = await AppointmentModel_doctor.findOneAndUpdate(
             {
                 doctor: doctorId,
                 "availability.date": date,
                 "availability.slots.startTime": startTime,
                 "availability.slots.endTime": endTime,
-                "availability.slots.isBooked": false
+                "availability.slots.isBooked": false,
             },
             {
-                $set: { "availability.$.slots.$[slot].isBooked": true }
+                $set: {
+                    "availability.$.slots.$[slot].isBooked": true,
+                    "availability.$.slots.$[slot].PatientId": patientId, // Add PatientId to the slot
+                },
             },
             {
                 arrayFilters: [{ "slot.startTime": startTime, "slot.endTime": endTime }],
-                new: true
+                new: true,
             }
         );
 
@@ -128,15 +129,19 @@ export const bookAppointment = async (req, res) => {
         const newUserAppointment = new AppointmentModel_user({
             user: patientId,
             doctor: doctorId,
-            availability: [{
-                day: new Date(date).toLocaleString("en-us", { weekday: "long" }),
-                date: date,
-                slots: [{
-                    startTime,
-                    endTime,
-                    isBooked: true
-                }]
-            }]
+            availability: [
+                {
+                    day: new Date(date).toLocaleString("en-us", { weekday: "long" }),
+                    date: date,
+                    slots: [
+                        {
+                            startTime,
+                            endTime,
+                            isBooked: true,
+                        },
+                    ],
+                },
+            ],
         });
 
         await newUserAppointment.save();
@@ -144,9 +149,8 @@ export const bookAppointment = async (req, res) => {
         return res.status(201).json({
             message: "Appointment booked successfully",
             appointment: newUserAppointment,
-            success:"true"
+            success: true,
         });
-
     } catch (error) {
         console.error("Error booking appointment:", error);
         return res.status(500).json({ message: "Failed to book appointment" });
