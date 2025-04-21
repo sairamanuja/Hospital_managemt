@@ -1,55 +1,49 @@
-import React from 'react'
-import './App.css'
-import {Routes, Route, BrowserRouter} from 'react-router-dom'
-import HomePage from './pages/HomePage'
-import Signup from './pages/Signup'
-import Login from './pages/Login'
-import ContactUs from './pages/ContactUs'
-import Profile from './pages/Profile'
-import Aboutus from './pages/Aboutus'
-import Admin_Adddoctor from './pages/Admin_Adddoctor'
-import {  AdminSignup } from './pages/AdminSignup'
-import AdminLogin  from './pages/AdminLogin'
-import Sidebar from './Components/ui/Sidebar2'
-import axios from 'axios'
-import { ProtectedRoute} from './Components/config/config'
-import Admin_doctors from './pages/Admin_doctors'
-import {Admin_doctor_view} from './pages/Admin_doctor_view'
-import { View_Doctor_user } from './pages/View_Doctor_user'
-import { All_Doctors_user } from './pages/All_Doctors_user'
-function App() {
-  
-
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AdminProvider } from './context/AdminContext';
+import Home from './pages/user/Home';
+import {ProtectedRoute} from './Config/ProtectedRoutes';
+import {Login} from './pages/user/Login';
+import {Signup} from './pages/user/Signup';
+import { ContactUs } from './pages/user/ContactUs';
+import { AboutUs } from './pages/user/AboutUs';
+import { AllDoctors_user } from './pages/user/AllDoctors_user';
+import { Profile } from './pages/user/Profile';
+import { Add_Appointment } from './pages/user/Add_Appointment';
+import { AllDoctors } from './pages/admin/AllDoctors';
+import { AdminLogin } from './pages/admin/Signin';
+import {AdminSignup} from './pages/admin/Signup'
+import { Add_Doctor } from './pages/admin/Add_Doctor';
+import { AllDoctorAppointments } from './pages/admin/Dashboard';
+import { View_doctor } from './pages/admin/View_Doctor';
+import Appointments from './pages/user/MyAppointments';
+const App = () => {
   return (
-    <>
-        <BrowserRouter>
-     <Routes>
-      <Route path="/" element={<HomePage/>}/>
-      <Route path="/signup" element={<Signup/>}/>
-      <Route path="/login" element={<Login/>}/>
-      <Route path="/doctor/:id" element={<View_Doctor_user/>}/>
-      <Route path="/contactus" element={<ContactUs/>}/>
-      <Route path="/profile" element={<Profile/>}/>
-      <Route path="/aboutus" element={<Aboutus/>}/>
-      <Route element={<ProtectedRoute />}>
-        <Route path="/admin/adddoctor" element={<Admin_Adddoctor />} />
-        <Route path="/admin/doctors" element={<Admin_doctors />} />
-        <Route path="/admin/doctor/:id" element={<Admin_doctor_view />} />
-      </Route>
-     
-      <Route path="/adminsignup" element={<AdminSignup/>}/>
-      <Route path="/adminlogin" element={<AdminLogin/>}/>
-      <Route path="/sidebar2" element={<Sidebar/>}/>
-      <Route path="/alldoctors" element={<All_Doctors_user/>}/>
+    <Router>
+      <AdminProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/contactus" element={<ContactUs />} />
+          <Route path="/allDoctors" element={<AllDoctors_user />} />
+          <Route path="/aboutus" element={<AboutUs />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/admin/alldoctors" element={<AllDoctors />} />
+          <Route path="/admin/signin" element={<AdminLogin />} />
+          <Route path="/admin/signup" element={<AdminSignup />} />
+          <Route path="/admin/addDoctor" element={<Add_Doctor />} />
+          <Route path="/admin/allappointments" element={<AllDoctorAppointments />} />
+          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/admin/doctor/:id" element={<View_doctor />} />
+          
+          <Route element={<ProtectedRoute />}>
+            <Route path="/doctor/:id" element={<Add_Appointment />} />
+          </Route>
+        </Routes>
+      </AdminProvider>
+    </Router>
+  );
+};
 
-
-      
-     </Routes>   
-     </BrowserRouter>
-     </>
-     
-    
-    )
-}
-
-export default App
+export default App;

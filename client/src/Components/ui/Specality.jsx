@@ -6,11 +6,11 @@ export const Speciality = ({ text, onClick, isSelected }) => {
       <div
         className={`w-fit p-3 border rounded-lg cursor-pointer ${
           isSelected
-            ? 'bg-[#5F6FFF] text-white' // Apply selected styles
-            : 'hover:bg-[#5F6FFF] hover:text-white' // Apply hover styles
+            ? 'bg-[#5F6FFF] text-white' 
+            : 'hover:bg-[#5F6FFF] hover:text-white' 
         }`}
-        onClick={onClick} // Attach click handler
-        role="button" // Add role for accessibility
+        onClick={onClick} 
+        role="button" 
         aria-label={`Select ${text} speciality`} 
       >
         {text}

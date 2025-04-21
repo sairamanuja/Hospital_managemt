@@ -1,5 +1,6 @@
 import {AdminModel} from "../Models/admin_model.js"
 import {DoctorModel} from "../Models/doctor_model.js";
+import { UserModel } from "../Models/user_model.js";
 import{AppointmentModel_doctor} from "../Models/appointment_doctor.js"
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
@@ -387,21 +388,25 @@ export const AllDoctorAppointments = async (req, res) => {
         const appointments = await AppointmentModel_doctor.find()
             .populate({
                 path: 'doctor',
-                model: 'Doctors', // Changed from 'Doctor' to 'Doctors'
+                model: 'Doctors',
                 select: 'name email speciality'
-            })
-            .populate({
-                path: 'availability.slots.PatientId',
-                model: 'User',
-                select: 'name email phone'
             });
 
-        if (!appointments || appointments.length === 0) {
-            return res.status(200).json({
-                success: true,
-                message: "No appointments found",
-                appointments: []
-            });
+        // Manually populate nested PatientId fields
+        for (const appointment of appointments) {
+            for (const avail of appointment.availability) {
+                for (const slot of avail.slots) {
+                    console.log(slot.PatientId)
+                    if (slot.PatientId) {
+                        const patient = await UserModel.findById(slot.PatientId).select("name email phone");
+                        //console.log(patient)
+                       
+                        slot.PatientId = patient;
+                        console.log(slot.PatientId)
+
+                    }
+                }
+            }
         }
 
         const formattedAppointments = appointments.map(appointment => ({
